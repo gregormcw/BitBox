@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<head>
+	<meta name ="author" content="Gregor McWilliam">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title id="main-title">== CoBox ==</title>
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
+	<script src="client.js"></script>
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.js"></script>
+
+<body>
+
+	<div class="col-lg-12 col-md-12 col-sm-12">
+
+		<h1 id="main-header"> =>> CoBox <<= </h1>
+
+		<h4 id="sub-header"> The collaborative playlist.</h4>
+
+		<label id="select-song" for="songs">Select a Song</label>
+
+		<br>
+
+		<select name="song-selection" id="song-selection">
+
+			<option id="queen-another-one-bites-the-dust" value="spotify:track:57JVGBtBLCfHw2muk5416J">Queen - Another One Bites the Dust</option>
+			<option id="beatles-cant-by-me-love" value="spotify:track:3SdingSsFcZDZAyvcJbgAw">The Beatles - Can't Buy Me Love</option>
+			<option id="bill-evans-nardis" value="spotify:track:37vEa9sfgAqEZuqX8AX0Zk">Bill Evans - Nardis</option>
+			<option id="jungle-busy-earnin" value="spotify:track:5TloYFwzd09yWy8xkRLVUu">Jungle - Busy Earnin'</option>
+			<option id="tame-impala-less-i-know" value="spotify:track:6K4t31amVTZDgR3sKmwUJJ">Tame Impala - The Less I Know the Better</option>
+			<option id="helado-mundo-mitad-del-mundo" value="spotify:track:6Rf8p9wirMmOJUR0qmjzqQ">Helado Mundo - Mitad Del Mundo</option>
+			<option id="sufjan-stevens-interlude-ii" value="spotify:track:0w3PwZW7JeBdp8aFI3IKWp">Sufjan Stevens - Interlude II: Subi Power Waltz</option>
+
+		</select>
+
+		<br>
+
+		<button id='enqueue' type="submit" onclick="addTrackToQueue()">Add to Queue</button>
+
+		<h4 id="author">
+			By Gregor McWilliam
+		</h4>
+
+		<h4 id="copyright">
+			&copy; CoBox 2021
+		</h4>
+
+	</div>
+
+</body>
+ 	
+</html>
+
+
+
+
+
