@@ -1,2 +1,2 @@
-# CoBox
-CoBox - the collaborative playlist
+# BitBox
+BitBox: A Collaborative Playlist
