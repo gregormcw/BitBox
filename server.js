@@ -12,7 +12,7 @@ const app = express();
 // - User connects with server, and server pushes command information to other device?
 // - Add visualization? Cassette tape turns when audio is playing? Spectrum of signal?
 // - Add live, informal user interaction on host screen: "@gmc just queued up some Talking Heads!"
-//    - This will keep users engaged with the app
+//    - This will add social element, and help ensure users are engaged with app
 
 // app.use(express.static(__dirname + '/public'));
 app.use(express.static('public'));
@@ -25,10 +25,14 @@ app.use(express.static('public'));
 
 const portNumber = 3000;
 var trackQueue = [];
+var ipDict = {};
 var numUsers = 0;
 var durString = "";
 var isPlaying = false;
 var defaultPlaylist = "Indie Party";
+var trackLimit = 3;
+var cooldownTime = 0.2;
+var initTime = new Date().getTime();
 
 // Command-line strings for generating track duration and position information
 const durCmd = "spotify status | grep 'Position:' | cut -d ' ' -f 4";
@@ -52,21 +56,75 @@ app.get("/", function(req, res) {
 	console.log("Received HTTP request. " + numUsers + " users served\n");
 
 	// Serve HTML file
-	res.sendFile(__dirname + "/public/collBox.html");
-	// res.sendFile(__dirname + "/public");
+	res.sendFile(__dirname + "/public/index.html");
 });
 
 // When data is posted
 app.post("/", function(req, res) {
 
-	// requestIP = req.connection.remoteAddress;
-	// console.log("Your IP address: " + requestIP);
+	let curTime = new Date().getTime();
+	let isValid = true;
 
-	// Add track URI to queue
-	trackQueue.push(req.body.myData);
+	// Get user IP address
+	let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-	// Add track to end of queue
-	console.log(req.body.myData + " added to position " + trackQueue.length + " in queue");
+	// =================================================================
+	// ==== vv This works, but logic isn't clear =======================
+	// ======= Clean it up! ============================================
+	// =================================================================
+
+	// If IP address has already requested a track
+	if (ip in ipDict && curTime - ipDict[ip][1] > 60000 * cooldownTime) {
+
+		// If user cooldown time has elapsed, reset play count and cooldown
+		ipDict[ip][0] = 0;
+		ipDict[ip][1] = curTime;
+		console.log("Cooldown period complete. " + ip + " reset to " + ipDict[ip][0]);
+
+	}
+
+	// If user still within cooldown time but at track limit, do nothing
+	else if (ip in ipDict && ipDict[ip][0] >= trackLimit) {
+
+		// Do nothing
+		isValid = false;
+
+	}
+
+	// Otherwise, increment play count by one, set most recent track play time, 
+	// and print feedback in console
+	else if (ip in ipDict) {
+
+		ipDict[ip][0]++;
+		ipDict[ip][1] = curTime;
+		console.log(ip + " incremented to " + ipDict[ip][0] + "!");
+
+	}
+
+	// If first request from this IP address, add it to dictionary with play count of 0
+	// and current time as last request time
+	else {
+
+		ipDict[ip] = [0, curTime];
+		console.log(ip + " added to dictionary with value " + ipDict[ip][0] + "!");
+
+	}
+
+	// Play track at start of queue
+	if (ipDict[ip][0] < trackLimit) {
+
+		// Add track URI to queue
+		trackQueue.push(req.body.myData);
+
+		// Add track to end of queue
+		console.log(req.body.myData + " added to position " + trackQueue.length + " in queue");
+	}
+
+	else {
+
+		console.log(trackLimit + "-track limit exceeded. " + cooldownTime +" minutes before reset");
+
+	}
 
 	// If only one track in queue, log information and play now
 	if (trackQueue.length == 1) {
@@ -103,8 +161,6 @@ app.listen(portNumber, function() {
 // ==== FUNCTIONS ==================================================
 // =================================================================
 // =================================================================
-
-// Last task: Ensure duration is updated 
 
 function manageQueue(dur) {
 
@@ -145,6 +201,7 @@ function manageQueue(dur) {
 
 		// Carry out above instructions only once the time, below, has elapsed
 	}, dur-1000);
+	// }, 10000);
 
 }
 
